@@ -1,4 +1,6 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 import 'login_page.dart';
 
 class RegisterPage extends StatefulWidget {
@@ -20,12 +22,55 @@ class _RegisterPageState extends State<RegisterPage> {
 
   bool emailExistsError = false;
 
-  void registerUser() {
+  Future<void> registerUser() async {
     if (_formKey.currentState!.validate()) {
-      // TODO: Call your backend API here using http or dio
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text("Registering user...")));
+      final url = Uri.parse("http://localhost:3399/api/register");
+      // ⚠️ Use 10.0.2.2 for Android emulator
+      // Replace with your PC’s IP if running on real device
+
+      final body = jsonEncode({
+        "fname": fnameController.text.trim(),
+        "mname": mnameController.text.trim(),
+        "lname": lnameController.text.trim(),
+        "mobile": mobileController.text.trim(),
+        "email": emailController.text.trim(),
+        "password": passwordController.text.trim(),
+      });
+
+      try {
+        final response = await http.post(
+          url,
+          headers: {"Content-Type": "application/json"},
+          body: body,
+        );
+
+        if (response.statusCode == 200) {
+          final data = jsonDecode(response.body);
+
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(data["message"] ?? "Registration successful"),
+            ),
+          );
+
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) => const LoginPage()),
+          );
+        } else if (response.statusCode == 409) {
+          setState(() {
+            emailExistsError = true;
+          });
+        } else {
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(SnackBar(content: Text("Error: ${response.body}")));
+        }
+      } catch (e) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text("Failed: $e")));
+      }
     }
   }
 
@@ -159,7 +204,6 @@ class _RegisterPageState extends State<RegisterPage> {
 
                   const SizedBox(height: 15),
 
-                  // ---------------- "Login" button style ----------------
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
@@ -176,15 +220,6 @@ class _RegisterPageState extends State<RegisterPage> {
                             ),
                           );
                         },
-                        style: TextButton.styleFrom(
-                          padding: EdgeInsets.zero, // removes default padding
-                          minimumSize: const Size(
-                            0,
-                            0,
-                          ), // removes min size constraints
-                          tapTargetSize: MaterialTapTargetSize
-                              .shrinkWrap, // shrinks tap area
-                        ),
                         child: const Text(
                           "Login",
                           style: TextStyle(

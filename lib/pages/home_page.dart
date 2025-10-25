@@ -3,6 +3,7 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'login_page.dart'; // ✅ Import the LoginPage
+import 'bookingpage.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
@@ -14,9 +15,13 @@ class HomePage extends StatelessWidget {
       appBar: AppBar(
         title: Row(
           children: [
-            CircleAvatar(
-              radius: 22,
-              backgroundImage: AssetImage("assets/images/MMBLogo.jpg"),
+            ClipOval(
+              child: Image.asset(
+                "assets/images/MMBLogo.jpg",
+                width: 45, // adjust width
+                height: 32, // adjust height
+                fit: BoxFit.cover,
+              ),
             ),
             const SizedBox(width: 10),
             const Text("MM Borewell"),
@@ -33,7 +38,9 @@ class HomePage extends StatelessWidget {
               decoration: BoxDecoration(
                 color: Colors.white,
                 borderRadius: BorderRadius.circular(12),
-                boxShadow: const [BoxShadow(color: Colors.black12, blurRadius: 4)],
+                boxShadow: const [
+                  BoxShadow(color: Colors.black12, blurRadius: 4),
+                ],
               ),
               child: const TextField(
                 decoration: InputDecoration(
@@ -58,10 +65,24 @@ class HomePage extends StatelessWidget {
                 DashboardCard(title: "Images", icon: Icons.image),
                 DashboardCard(title: "Raw Material", icon: Icons.inventory),
                 DashboardCard(title: "Quotation", icon: Icons.request_quote),
-                DashboardCard(title: "Book", icon: Icons.book_online),
+                DashboardCard(
+                  title: "Book",
+                  icon: Icons.book_online,
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const Bookingpage(),
+                      ),
+                    );
+                  },
+                ),
                 DashboardCard(title: "Generate Bill", icon: Icons.receipt_long),
                 DashboardCard(title: "Price Details", icon: Icons.price_change),
-                DashboardCard(title: "More", icon: FontAwesomeIcons.chessKnight),
+                DashboardCard(
+                  title: "More",
+                  icon: FontAwesomeIcons.chessKnight,
+                ),
               ],
             ),
           ),
@@ -104,11 +125,12 @@ class DashboardCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: onTap ??
+      onTap:
+          onTap ??
           () {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text("$title clicked")),
-            );
+            ScaffoldMessenger.of(
+              context,
+            ).showSnackBar(SnackBar(content: Text("$title clicked")));
           },
       child: Card(
         elevation: 4,
@@ -121,7 +143,10 @@ class DashboardCard extends StatelessWidget {
               const SizedBox(height: 10),
               Text(
                 title,
-                style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+                style: const TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                ),
               ),
             ],
           ),
@@ -155,8 +180,10 @@ class AppDrawer extends StatelessWidget {
         children: [
           const DrawerHeader(
             decoration: BoxDecoration(color: Colors.red),
-            child: Text("MM Borewell",
-                style: TextStyle(color: Colors.white, fontSize: 20)),
+            child: Text(
+              "MM Borewell",
+              style: TextStyle(color: Colors.white, fontSize: 20),
+            ),
           ),
           ListTile(
             leading: const Icon(Icons.home),
